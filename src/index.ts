@@ -4,7 +4,7 @@ import { readdirSync } from "fs";
 
 process.env.PORT ??= "3000";
 
-const app = fastify();
+const app = fastify({ trustProxy: process.env.PROXIED });
 app.register(fastifyWebsocket);
 
 const routes = readdirSync(`${import.meta.dirname}/routes`);
