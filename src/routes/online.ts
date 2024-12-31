@@ -24,8 +24,6 @@ export default (
   fastify: FastifyInstance & { websocketServer: WebSocketServer },
 ) => {
   const broadcast = (data: BroadcastData) => {
-    console.log("Room", data.room);
-
     const otherUsers = data.room.users.filter(
       (user) => user.id != data.user.id,
     );
