@@ -20,7 +20,7 @@ export interface WSUser extends User {
 }
 
 export interface EventData {
-  user: WSUser;
   event: string;
+  user?: WSUser;
   data?: object;
 }

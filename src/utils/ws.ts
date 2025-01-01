@@ -10,17 +10,7 @@ const broadcast = (room: Room, data: EventData) => {
 
   for (const userSocket of otherSockets) {
     if (userSocket.ws.readyState === WebSocket.OPEN) {
-      userSocket.ws.send(
-        JSON.stringify({
-          user: {
-            id: data.user.id,
-            username: data.user.username,
-            guest: data.user.guest,
-          } as Omit<WSUser, "ws">,
-          event: data.event,
-          data: data.data,
-        } as EventData),
-      );
+      userSocket.ws.send(JSON.stringify(data as EventData));
     }
   }
 };
@@ -39,17 +29,7 @@ export const sendTo = ({ room, user }: SendTo, data: EventData) => {
   const { ws } = userSockets.find((s) => s.userId === user.id);
 
   if (ws.readyState === WebSocket.OPEN) {
-    ws.send(
-      JSON.stringify({
-        user: {
-          id: data.user?.id,
-          username: data.user?.username,
-          guest: data.user?.guest,
-        } as Omit<WSUser, "ws">,
-        event: data.event,
-        data: data.data,
-      } as EventData),
-    );
+    ws.send(JSON.stringify(data as EventData));
   }
 };
 

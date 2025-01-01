@@ -38,6 +38,14 @@ export default (
       room.highestUserCount++;
 
       sendTo({ room }, { user, event: "join" });
+      
+      sendTo(
+        { room, user },
+        {
+          event: "list",
+          data: { users: room.users.filter((u) => u.id != user.id) },
+        },
+      );
 
       ws.onmessage = async ({ data }) => {
         let parsed = {} as EventData;
