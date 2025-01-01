@@ -1,5 +1,5 @@
 import type { EventData, WSUser } from "#src/types.ts";
-import { rooms, sendTo, userSockets } from "#src/utils/ws.ts";
+import { dropUserSocket, rooms, sendTo, userSockets } from "#src/utils/ws.ts";
 import type { FastifyInstance, FastifyRequest } from "fastify";
 import { WebSocketServer } from "ws";
 
@@ -30,7 +30,9 @@ export default (
         };
       }
 
-      userSockets.push({ userId: user.id, ws, roomName: room.name });
+      const userSocket = { userId: user.id, ws, roomName: room.name };
+
+      userSockets.push(userSocket);
       room.users.push(user);
 
       room.highestUserCount++;
@@ -65,6 +67,8 @@ export default (
       };
 
       ws.onclose = () => {
+        dropUserSocket(user.id);
+
         if (room.users.length === 1) {
           rooms.splice(rooms.indexOf(room), 1);
         } else {

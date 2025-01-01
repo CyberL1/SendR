@@ -1,6 +1,6 @@
 import type { EventData, Room, UserSocket, WSUser } from "#src/types.ts";
 
-export const userSockets: UserSocket[] = [];
+export let userSockets: UserSocket[] = [];
 export const rooms: Room[] = [];
 
 const broadcast = (room: Room, data: EventData) => {
@@ -51,4 +51,8 @@ export const sendTo = ({ room, user }: SendTo, data: EventData) => {
       } as EventData),
     );
   }
+};
+
+export const dropUserSocket = (userId: string) => {
+  userSockets = userSockets.filter((s) => s.userId != userId);
 };
