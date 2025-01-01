@@ -41,7 +41,7 @@ export default (
         try {
           parsed = JSON.parse(data);
         } catch {
-          ws.close(1008, "data in not json");
+          ws.close(1008, "data is not json");
         }
 
         if (!["share"].includes(parsed.event)) {
