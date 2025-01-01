@@ -3,8 +3,9 @@ import { sendTo } from "#src/utils/ws.ts";
 
 interface ShareEvent {
   to: string;
-  type: "text";
+  type: "text" | "file";
   text?: string;
+  file?: { name: string; buffer: Buffer };
 }
 
 export default function (this: WebSocket, room: Room, event: EventData) {
@@ -42,11 +43,11 @@ export default function (this: WebSocket, room: Room, event: EventData) {
     return;
   }
 
-  if (!["text"].includes(data.type)) {
+  if (!["text", "file"].includes(data.type)) {
     this.send(
       JSON.stringify({
         to: "WS_EVENT_DATA_PROPERTY_WRONG_TYPE",
-        message: "Property 'type' must be one of text",
+        message: "Property 'type' must be one of text or file",
       }),
     );
     return;
@@ -62,6 +63,48 @@ export default function (this: WebSocket, room: Room, event: EventData) {
     return;
   }
 
+  if (data.type === "file" && !data.file) {
+    this.send(
+      JSON.stringify({
+        to: "WS_EVENT_DATA_PROPERTY_MISSING",
+        message: "Property 'type' is file, but property 'file' is missing",
+      }),
+    );
+    return;
+  }
+
+  if (data.type === "file" && !data.file) {
+    this.send(
+      JSON.stringify({
+        to: "WS_EVENT_DATA_PROPERTY_MISSING",
+        message: "Property 'type' is file, but property 'file' is missing",
+      }),
+    );
+    return;
+  }
+
+  if (data.type === "file" && data.file && !data.file.name) {
+    this.send(
+      JSON.stringify({
+        to: "WS_EVENT_DATA_PROPERTY_MISSING",
+        message:
+          "Property 'file' is present, but property 'file.name' is missing",
+      }),
+    );
+    return;
+  }
+
+  if (data.type === "file" && data.file && !data.file.buffer) {
+    this.send(
+      JSON.stringify({
+        to: "WS_EVENT_DATA_PROPERTY_MISSING",
+        message:
+          "Property 'file' is present, but property 'file.buffer' is missing",
+      }),
+    );
+    return;
+  }
+
   sendTo(
     { room: room, user: recipient },
     {
@@ -69,7 +112,11 @@ export default function (this: WebSocket, room: Room, event: EventData) {
       user: event.user,
       data: {
         type: data.type,
-        text: data.type === "text" ? data.text : null,
+        text: data.type === "text" ? data.text : undefined,
+        file:
+          data.type === "file"
+            ? { name: data.file.name, buffer: data.file.buffer }
+            : undefined,
       },
     },
   );

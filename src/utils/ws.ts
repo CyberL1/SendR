@@ -34,8 +34,6 @@ export const sendTo = ({ room, user }: SendTo, data: EventData) => {
   }
 
   if (user.ws.readyState === WebSocket.OPEN) {
-    delete data.user.ws;
-
     user.ws.send(
       JSON.stringify({
         user: {
