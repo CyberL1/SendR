@@ -1,5 +1,5 @@
 import type { EventData, WSUser } from "#src/types.ts";
-import { rooms, sendTo } from "#src/utils/ws.ts";
+import { rooms, sendTo, userSockets } from "#src/utils/ws.ts";
 import type { FastifyInstance, FastifyRequest } from "fastify";
 import { WebSocketServer } from "ws";
 
@@ -27,11 +27,12 @@ export default (
           id: username.toLowerCase().replaceAll(" ", "-"),
           username,
           guest: true,
-          ws,
         };
       }
 
+      userSockets.push({ userId: user.id, ws, roomName: room.name });
       room.users.push(user);
+
       room.highestUserCount++;
 
       sendTo({ room }, { user, event: "join" });

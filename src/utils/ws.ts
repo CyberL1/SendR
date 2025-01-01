@@ -1,13 +1,16 @@
-import type { EventData, Room, WSUser } from "#src/types.ts";
+import type { EventData, Room, UserSocket, WSUser } from "#src/types.ts";
 
+export const userSockets: UserSocket[] = [];
 export const rooms: Room[] = [];
 
 const broadcast = (room: Room, data: EventData) => {
-  const otherUsers = room.users.filter((user) => user.id != data.user.id);
+  const otherSockets = userSockets.filter(
+    (s) => s.roomName === room.name && s.userId != data.user.id,
+  );
 
-  for (const user of otherUsers) {
-    if (user.ws.readyState === WebSocket.OPEN) {
-      user.ws.send(
+  for (const userSocket of otherSockets) {
+    if (userSocket.ws.readyState === WebSocket.OPEN) {
+      userSocket.ws.send(
         JSON.stringify({
           user: {
             id: data.user.id,
@@ -33,13 +36,15 @@ export const sendTo = ({ room, user }: SendTo, data: EventData) => {
     return;
   }
 
-  if (user.ws.readyState === WebSocket.OPEN) {
-    user.ws.send(
+  const { ws } = userSockets.find((s) => s.userId === user.id);
+
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(
       JSON.stringify({
         user: {
-          id: data.user.id,
-          username: data.user.username,
-          guest: data.user.guest,
+          id: data.user?.id,
+          username: data.user?.username,
+          guest: data.user?.guest,
         } as Omit<WSUser, "ws">,
         event: data.event,
         data: data.data,

@@ -9,8 +9,13 @@ export interface Room {
   highestUserCount: number;
 }
 
-export interface WSUser extends User {
+export interface UserSocket {
+  userId: string;
+  roomName: string;
   ws: WebSocket;
+}
+
+export interface WSUser extends User {
   guest?: boolean;
 }
 
