@@ -73,17 +73,7 @@ export default function (this: WebSocket, room: Room, event: EventData) {
     return;
   }
 
-  if (data.type === "file" && !data.file) {
-    this.send(
-      JSON.stringify({
-        to: "WS_EVENT_DATA_PROPERTY_MISSING",
-        message: "Property 'type' is file, but property 'file' is missing",
-      }),
-    );
-    return;
-  }
-
-  if (data.type === "file" && data.file && !data.file.name) {
+  if (data.file && !data.file.name) {
     this.send(
       JSON.stringify({
         to: "WS_EVENT_DATA_PROPERTY_MISSING",
@@ -94,7 +84,17 @@ export default function (this: WebSocket, room: Room, event: EventData) {
     return;
   }
 
-  if (data.type === "file" && data.file && !data.file.buffer) {
+  if (data.file.name.includes("/") || data.file.name.includes("\\")) {
+    this.send(
+      JSON.stringify({
+        to: "WS_EVENT_DATA_FILE_NAME_NO_SLASH",
+        message: "Property 'file.name' MUST NOT contain slashes",
+      }),
+    );
+    return;
+  }
+
+  if (data.file && !data.file.buffer) {
     this.send(
       JSON.stringify({
         to: "WS_EVENT_DATA_PROPERTY_MISSING",
