@@ -84,7 +84,10 @@ export default function (this: WebSocket, room: Room, event: EventData) {
     return;
   }
 
-  if (data.file.name.includes("/") || data.file.name.includes("\\")) {
+  if (
+    data.file &&
+    (data.file.name.includes("/") || data.file.name.includes("\\"))
+  ) {
     this.send(
       JSON.stringify({
         to: "WS_EVENT_DATA_FILE_NAME_NO_SLASH",
